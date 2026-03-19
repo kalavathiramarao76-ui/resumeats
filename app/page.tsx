@@ -9,8 +9,9 @@ export default function HomePage() {
           <Link href="/" className="text-xl font-bold text-brand-600">Resume<span className="text-gray-900">ATS</span></Link>
           <div className="flex items-center gap-4">
             <Link href="/scanner" className="text-sm text-gray-600 hover:text-gray-900">ATS Scanner</Link>
-            <Link href="/builder" className="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition">
-              Build Resume Free
+            <Link href="/login" className="text-sm text-gray-600 hover:text-gray-900">Log In</Link>
+            <Link href="/signup" className="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition">
+              Sign Up Free
             </Link>
           </div>
         </div>
