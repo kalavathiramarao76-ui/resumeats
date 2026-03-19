@@ -3,9 +3,24 @@ import { getDB } from '@/lib/db';
 import { makeSessionToken, SESSION_COOKIE } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
 
+// Simple in-memory rate limiter
+const attempts = new Map<string, { count: number; resetAt: number }>();
+function rateLimit(ip: string, limit = 10, windowMs = 60000): boolean {
+  const now = Date.now();
+  const entry = attempts.get(ip);
+  if (!entry || entry.resetAt < now) { attempts.set(ip, { count: 1, resetAt: now + windowMs }); return true; }
+  entry.count++;
+  return entry.count <= limit;
+}
+
 // POST /api/auth — login or signup
 export async function POST(req: NextRequest) {
-  const { action, email, password, fullName } = await req.json();
+  const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+  if (!rateLimit(ip)) return NextResponse.json({ error: 'Too many requests. Please try again in a minute.' }, { status: 429 });
+
+  let body;
+  try { body = await req.json(); } catch { return NextResponse.json({ error: 'Invalid request body' }, { status: 400 }); }
+  const { action, email, password, fullName } = body;
   const sql = getDB();
 
   if (action === 'signup') {
